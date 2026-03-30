@@ -1,0 +1,381 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analog Horror Generator</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .bug-report-rating,
+    .suggestion-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .vote-btn {
+      background: transparent;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 0.3rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .vote-btn:hover {
+      background: rgba(255, 0, 0, 0.1);
+      border-color: #ff0000;
+    }
+
+    .vote-btn.vote-up {
+      color: green;
+    }
+
+    .vote-btn.vote-down {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Analog Horror Generator</h1>
+    <div class="tab-container">
+      <div class="main-tabs">
+        <button class="main-tab active" data-tab="broadcast">
+          <img src="/Radio.png" alt="Radio" style="width: 60px; height: 60px; vertical-align: middle;">
+        </button>
+        <button class="main-tab" data-tab="assets">
+          <img src="/painting (1).png" alt="Assets" style="width: 40px; height: 40px; vertical-align: middle;">
+        </button>
+        <button class="main-tab" data-tab="channels">
+          <img src="/video.png" alt="Channels" style="width: 40px; height: 40px; vertical-align: middle;">
+        </button>
+        <button class="main-tab" data-tab="credits">
+          <img src="/Smiley.png" alt="Credits" style="width: 40px; height: 40px; vertical-align: middle;">
+        </button>
+        <button class="main-tab" data-tab="voting">
+          <img src="/clock.png" alt="Feature Voting" style="width: 40px; height: 40px; vertical-align: middle;">
+        </button>
+      </div>
+
+      <!-- Broadcast Tab -->
+      <div class="tab-content active" id="broadcast-content">
+        <div class="input-section">
+          <div class="ai-writer">
+            <div class="ai-input-container">
+              <input type="text" id="ai-prompt-input" placeholder="Enter a theme or context for the AI broadcast...">
+              <button id="ai-writer-btn">Generate</button>
+            </div>
+            <div class="ai-progress-container">
+              <div id="ai-progress" class="ai-progress-bar"></div>
+            </div>
+          </div>
+          <div class="logo-controls">
+            <label class="logo-toggle">
+              <input type="checkbox" id="show-eas"> Show EAS Logo
+            </label>
+            <label class="logo-toggle">
+              <input type="checkbox" id="show-blubber"> Show Blubber Logo
+            </label>
+            <label class="logo-toggle">
+              <input type="checkbox" id="smooth-images" checked> Smooth Image Transitions
+            </label>
+          </div>
+          <textarea id="horror-text" placeholder="Enter your horror text here...">EMERGENCY BROADCAST SYSTEM
+
+This is a demonstration of the Analog Horror Generator system.
+
+The system features multiple tabs for creating content and more:
+- Broadcast: Create emergency messages
+- Gallery: View available horror elements
+- Channels: View my youtube channels
+- Bug Reports: Report bugs you found in the game
+- Special Thanks: Discover cool features and great contributors
+- Update Ideas: Give me ideas on what to add to the Generator
+
+NOTICE:
+Hidden features can be unlocked through special broadcast codes.
+
+Stay vigilant for clues.</textarea>
+          <!-- The asset preview panel will be inserted here by JavaScript -->
+          <div class="controls">
+            <!-- Voice Settings -->
+            <div class="settings-group voice-settings">
+              <h3 class="settings-title">Voice Settings</h3>
+              <div class="voice-container">
+                <label for="voice-select">Voice:</label>
+                <select id="voice-select">
+                  <option value="">Loading voices...</option>
+                </select>
+                <button id="test-voice">Test Voice</button>
+              </div>
+              <div class="slider-container">
+                <label for="voice-pitch">Pitch:</label>
+                <input type="range" id="voice-pitch" min="0.5" max="2" step="0.1" value="1">
+                <span id="voice-pitch-value">1.0</span>
+              </div>
+              <div class="slider-container">
+                <label for="voice-speed">Speed:</label>
+                <input type="range" id="voice-speed" min="0.5" max="2" step="0.1" value="1">
+                <span id="voice-speed-value">1.0</span>
+              </div>
+              <div class="slider-container">
+                <label for="voice-volume">Volume:</label>
+                <input type="range" id="voice-volume" min="0" max="3" step="0.1" value="1">
+                <span id="voice-volume-value">1.0</span>
+              </div>
+            </div>
+            
+            <!-- Video Settings -->
+            <div class="settings-group video-settings">
+              <h3 class="settings-title">Video Settings</h3>
+              <button id="analyse-broadcast-btn" class="analyse-btn">Analyse Broadcast</button>
+              <div class="slider-container">
+                <label for="glitch-intensity">Glitch Intensity:</label>
+                <input type="range" id="glitch-intensity" min="0" max="100" value="50">
+                <span id="glitch-value">50%</span>
+              </div>
+              <div class="slider-container">
+                <label for="glitch-theme">Glitch Theme:</label>
+                <select id="glitch-theme">
+                  <option value="classic">Classic</option>
+                  <option value="vhs">VHS</option>
+                  <option value="digital">Digital</option>
+                  <option value="interference">Interference</option>
+                  <option value="corrupted">Corrupted</option>
+                  <option value="vintage">Vintage Film</option>
+                  <option value="paranormal">Paranormal</option>
+                  <option value="dystopian">Dystopian</option>
+                  <option value="alien">Alien Transmission</option>
+                  <option value="supernatural">Supernatural</option>
+                </select>
+                <button id="custom-theme-btn" class="tool-btn">Custom</button>
+              </div>
+              <div id="custom-theme-controls" class="custom-theme-controls" style="display: none;">
+                <div class="slider-container">
+                  <label for="custom-flicker">Flicker Intensity:</label>
+                  <input type="range" id="custom-flicker" min="0" max="100" value="50">
+                  <span id="custom-flicker-value">50%</span>
+                </div>
+                <div class="slider-container">
+                  <label for="custom-distortion">Distortion:</label>
+                  <input type="range" id="custom-distortion" min="0" max="100" value="30">
+                  <span id="custom-distortion-value">30%</span>
+                </div>
+                <div class="slider-container">
+                  <label for="custom-noise">Noise Amount:</label>
+                  <input type="range" id="custom-noise" min="0" max="100" value="20">
+                  <span id="custom-noise-value">20%</span>
+                </div>
+                <div class="slider-container">
+                  <label for="custom-color-shift">Color Shift:</label>
+                  <input type="range" id="custom-color-shift" min="0" max="100" value="40">
+                  <span id="custom-color-shift-value">40%</span>
+                </div>
+                <button id="save-theme-btn" class="tool-btn">Save Theme</button>
+              </div>
+              <div class="slider-container">
+                <label for="vhs-strength">VHS Strength:</label>
+                <input type="range" id="vhs-strength" min="0" max="100" value="50">
+                <span id="vhs-value">50%</span>
+              </div>
+              <div class="slider-container">
+                <label for="scanline-speed">Scanline Speed:</label>
+                <input type="range" id="scanline-speed" min="1" max="10" value="5">
+                <span id="scanline-speed-value">5</span>
+              </div>
+              <div class="slider-container">
+                <label for="scanline-size">Scanline Size:</label>
+                <input type="range" id="scanline-size" min="1" max="10" value="2">
+                <span id="scanline-size-value">2px</span>
+              </div>
+              <div class="slider-container">
+                <label for="scanline-count">Scanline Count:</label>
+                <input type="range" id="scanline-count" min="0" max="10" value="1">
+                <span id="scanline-count-value">1</span>
+              </div>
+              <div class="slider-container">
+                <label for="scanline-distance">Scanline Distance:</label>
+                <input type="range" id="scanline-distance" min="5" max="20" value="10">
+                <span id="scanline-distance-value">10%</span>
+              </div>
+              <div class="slider-container">
+                <label for="scanline-color">Scanline Color:</label>
+                <input type="color" id="scanline-color" value="#ffffff">
+              </div>
+            </div>
+            
+            <!-- Hijack Settings -->
+            <div class="settings-group hijack-settings">
+              <h3 class="settings-title">Hijack Settings</h3>
+              <p style="color: #ff0000; margin-bottom: 1rem; font-style: italic;">To start a hijack, type "{hijack}" into your broadcast whereever you want it to start. It might be bugged tho or just not work at all</p>
+              <div class="slider-container duration-slider">
+                <label for="hijack-duration">Hijack Duration:</label>
+                <input type="range" id="hijack-duration" min="10" max="300" value="120">
+                <span id="hijack-duration-value">120s</span>
+              </div>
+            </div>
+            
+            <button id="generate-btn">Generate Horror</button>
+            <button id="stop-btn" class="stop-button">Stop</button>
+          </div>
+        </div>
+        <div class="video-container" id="video-output">
+          <div class="screen-effect">
+            <div class="broadcast-logo">
+              <img src="/logo1.png" alt="EAS Logo">
+            </div>
+            <div class="glitch-text" id="output-text"></div>
+            <div class="horror-image"></div>
+            <div class="creepy-eyes"></div>
+            <div class="scan-line"></div>
+            <div class="noise"></div>
+          </div>
+        </div>
+        <div class="video-controls">
+          <button id="download-video-btn" class="download-video-btn" disabled>
+            <img src="/download.png" alt="Download">
+            Download Video
+          </button>
+          <div class="download-note">Note: Video download is experimental and may download corrupted files</div>
+        </div>
+      </div>
+
+      <!-- Assets Tab -->
+      <div class="tab-content" id="assets-content">
+        <!-- Content will be dynamically populated by JavaScript -->
+      </div>
+
+      <!-- Channels Tab -->
+      <div class="tab-content" id="channels-content">
+        <div class="channels-container">
+          <h2>My YouTube Channels</h2>
+          <div class="channel-list">
+            <div class="channel-item">
+              <h3>Animations</h3>
+              <a href="https://www.youtube.com/@BlubberTheFish" target="_blank" class="channel-link">
+                <img src="/video.png" alt="Channel" class="channel-icon">
+                <span>@BlubberTheFish</span>
+              </a>
+            </div>
+            <div class="channel-item">
+              <h3>Websim Showcases</h3>
+              <a href="https://www.youtube.com/@BlubberFischAnalogHorror/videos" target="_blank" class="channel-link">
+                <img src="/video.png" alt="Channel" class="channel-icon">
+                <span>@BlubberFischAnalogHorror</span>
+              </a>
+            </div>
+            <div class="channel-item">
+              <h3>Horizon Newsline</h3>
+              <a href="https://www.youtube.com/@HorizonNewslineBroadcasts" target="_blank" class="channel-link">
+                <img src="/video.png" alt="Channel" class="channel-icon">
+                <span>@HorizonNewslineBroadcasts</span>
+              </a>
+            </div>
+            <div class="channel-item">
+              <h3>Programming</h3>
+              <a href="https://www.youtube.com/@BlubberProgramming" target="_blank" class="channel-link">
+                <img src="/video.png" alt="Channel" class="channel-icon">
+                <span>@BlubberProgramming</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credits Tab -->
+      <div class="tab-content" id="credits-content">
+        <div class="user-welcome">
+          <h2>Welcome to the Analog Horror Generator</h2>
+          <p id="user-greeting">Loading...</p>
+          <div class="view-counter">
+            <p>Total views: <span id="view-count-all" class="view-stat">24k+</span></p>
+            <!-- Other view counters are now hidden via JavaScript -->
+          </div>
+        </div>
+        <div class="credits-container">
+          <h2>Special Thanks</h2>
+          <div class="credit-list">
+            <div class="credit-item">
+              <h3>@CrunchyWax</h3>
+              <p>Inspired the addition of broadcast hijacks to create more unsettling experiences</p>
+            </div>
+            <div class="credit-item">
+              <h3>@Basil</h3>
+              <p>Suggested the feature to upload custom images to the horror generator, custom glitch types, and the timeline for changing assets</p>
+            </div>
+            <div class="credit-item">
+              <h3>@Foshian4Dayz</h3>
+              <p>Inspired the addition of broadcast logos and logo system</p>
+            </div>
+            <div class="credit-item">
+              <h3>@vibrantgalaxy93279520</h3>
+              <p>Reported the "dot" bug where the dots where spoken after the sentence again weirdly</p>
+            </div>
+            <div class="credit-item">
+              <h3>@The_Sovereign</h3>
+              <p>Suggested the function of multiple images being shown at the same time in the broadcast</p>
+            </div>
+            <div class="credit-item">
+              <h3>@Sisyphos</h3>
+              <p>YouWouldntStealACar</p>
+            </div>
+            <div class="credit-item">
+              <h3>@cleverorchid0221057</h3>
+              <button id="jumpscare-btn" class="action-btn">Press me for jumpscare</button>
+            </div>
+            <div class="credit-item">
+              <h3>@Badorskube12</h3>
+              <p>AManHasFallenIntoTheRiver</p>
+            </div>
+          </div>
+          <div class="credits-hint">
+            <p>If you want to end up in the honorable people tab too, just give me an idea on what to add next to the analog horror generator, and if I read your comment, you might be next...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voting Tab -->
+      <div class="tab-content" id="voting-content">
+        <div class="voting-container">
+          <h2>Feature Voting</h2>
+          
+          <div class="voting-redirect">
+            <p>Vote for new features on the official voting website!</p>
+            <a href="https://websim.com/@blubber/analog-horror-broadcast-generator-feature-voting" class="vote-redirect-btn">Go to Voting Website</a>
+          </div>
+
+          <div id="admin-controls" style="display: none;">
+            <h3>Admin Controls</h3>
+            <button id="add-feature-btn" class="admin-btn">Add Winning Feature</button>
+            
+            <div id="feature-form" class="feature-form" style="display: none;">
+              <div class="form-group">
+                <label>Winning Feature:</label>
+                <input type="text" id="winning-feature" placeholder="Enter winning feature">
+                <input type="number" id="winning-votes" placeholder="Number of votes">
+              </div>
+              
+              <div class="form-group">
+                <label>Runner Up #1:</label>
+                <input type="text" id="runner-up-1" placeholder="Enter runner up feature">
+                <input type="number" id="runner-up-1-votes" placeholder="Number of votes">
+              </div>
+              
+              <div class="form-group">
+                <label>Runner Up #2:</label>
+                <input type="text" id="runner-up-2" placeholder="Enter runner up feature">
+                <input type="number" id="runner-up-2-votes" placeholder="Number of votes">
+              </div>
+              
+              <button id="save-results-btn" class="admin-btn">Save Results</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="horror-generator.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
